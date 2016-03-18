@@ -28,37 +28,17 @@
 		</div>
 
 	</div>
-
-	<script src="includes/parsefile.js"></script>
-
-
-
-	<?php
-	$query = mysqli_query($conn,"SELECT * FROM USER");
-	if (!$query) {
-		die('Invalid query: ' . mysqli_error($conn));
-	}
-
-	$rows = array();
-
-	if ($query->num_rows > 0)
-	{
-		while($row = $query->fetch_assoc()) {
-			$rows[] = $row;
-   		}
-	}
-	echo json_encode($rows);
-	?>;
-
+	
 	<script>
-		function submit() {
+		var dbUsers = <?php $query = mysqli_query($conn,"SELECT * FROM USER"); if (!$query) { die('Invalid query: ' . mysqli_error($conn)); } $rows = array(); if ($query->num_rows > 0) { while($row = $query->fetch_assoc()) { $rows[] = $row;    } } echo json_encode($rows); ?>;
 
+		function submit() {
 
 			//AJAX code to submit form.
 			$.ajax({
 				type: "POST",
 				url: "includes/submit.php",
-				data: {warInfo: warInfo, teamInfo: teamInfo, enemyInfo: enemyInfo},
+				data: {warInfo: warInfo, teamInfo: teamInfo, enemyInfo: enemyInfo, dbUsers: dbUsers},
 				headers : { 'Content-Type' : 'application/x-www-form-urlencoded; charset=UTF-8' },
 				success: function(html) {
 					console.log(html);
@@ -72,6 +52,7 @@
 			return false;
 		}
 	</script>
+	<script src="includes/parsefile.js"></script>
 
 </body>
 </html>

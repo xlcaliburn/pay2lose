@@ -1,5 +1,6 @@
 var file;
 var warInfo, teamInfo, enemyInfo;
+
 window.onload = function() {
 
 	var fileInput = document.getElementById('fileInput');
@@ -15,6 +16,8 @@ window.onload = function() {
 			warInfo = parseWarInfo(sections[1]);
 			teamInfo = parseTeamInfo(sections[2]);
 			enemyInfo = parseEnemyInfo(sections[3]);
+
+			warAttackInfo = consolidateInfo(teamInfo, enemyInfo);
 
 			fileDisplayArea.innerHTML = parseFile(sections[1]) + parseFile(sections[2]) + parseFile(sections[3]);
 		}	
@@ -86,22 +89,22 @@ function parseWarInfo(input) {
 	return warInfo;
 }
 
+function consolidateInfo(teamInfo, enemyInfo) {
+
+	for (var i = 0; i < teamInfo.length; i++) {
+		var enemyRank = teamInfo[i]['enemyRank'];
+
+		if (enemyRank){
+			var enemyWeight = enemyInfo[enemyRank-1]['warWeight'];
+			teamInfo[i]['enemyWeight'] = enemyWeight;
+		}
+
+			console.log(teamInfo[i]);
+	}
+
+}
+
 function parseTeamInfo(input) {
-
-    var oReq = new XMLHttpRequest(); //New request object
-    oReq.onload = function() {
-
-    	console.log(this);
-
-    };
-    oReq.open("get", "index.php", true);
-    //                               ^ Don't block the rest of the execution.
-    //                                 Don't wait until the request finishes to 
-    //                                 continue.
-    oReq.send();
-
-
-
 
 	var rank, player, warWeight, enemyRank, stars, percentage, loot, notes;
 	var teamInfo = [];
@@ -113,26 +116,37 @@ function parseTeamInfo(input) {
 		var data = lines[i].split(',');
 		if (data[0] != '')
 		{
-			rank = parseInt(data[0]);
-			player = data[1];
-			warWeight = parseInt(data[2]);
-			enemyRank = parseInt(data[3]);
+			// Find player
+			var playerid = '';		
+			for (var j = 0; j < dbUsers.length; j++) {
 
+				if (data[1] == dbUsers[j]['username'])
+				{
+					playerid = dbUsers[j]['userid'];
+					break;
+				}
+			}
+			rank = parseInt(data[0]);
+			player = parseInt(playerid);
+			warWeight = parseInt(data[2]);
+
+			enemyRank1 = parseInt(data[3]);
 			stars1= parseInt(data[4]);
 			percentage1 = parseFloat(data[5]);
-			loot1 = parseInt(data[6]);
+			loot1 = data[6] == '' ? 0 : parseInt(data[6]);
 			notes1= data[7];
 			
-			stars2= parseInt(data[8]);
-			percentage2 = parseFloat(data[9]);
-			loot2 = parseInt(data[10]);
-			notes2= data[11];	
+			enemyRank2 = parseInt(data[8]);
+			stars2= parseInt(data[9]);
+			percentage2 = parseFloat(data[10]);
+			loot2 = data[11] == '' ? 0 : parseInt(data[11]);
+			notes2= data[12];	
 
 			var attack1 = {
 				"rank": rank, 
-				"player": player, 
+				"playerid": player, 
 				"warWeight": warWeight,
-				"enemyRank": enemyRank,
+				"enemyRank": enemyRank1,
 				"attackNumber": 1,
 				"stars": stars1,
 				"percentage": percentage1,
@@ -142,9 +156,9 @@ function parseTeamInfo(input) {
 
 			var attack2 = {
 				"rank": rank, 
-				"player": player, 
+				"playerid": player, 
 				"warWeight": warWeight,
-				"enemyRank": enemyRank,
+				"enemyRank": enemyRank2,
 				"attackNumber": 2,
 				"stars": stars2,
 				"percentage": percentage2,
