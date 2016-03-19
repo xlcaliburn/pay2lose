@@ -1,8 +1,7 @@
 var file;
-var warInfo, teamInfo, enemyInfo;
+var warInfo, teamInfo, enemyInfo, warAttackInfo;
 
 window.onload = function() {
-
 	var fileInput = document.getElementById('fileInput');
 	var fileDisplayArea = document.getElementById('fileDisplayArea');
 
@@ -16,7 +15,6 @@ window.onload = function() {
 			warInfo = parseWarInfo(sections[1]);
 			teamInfo = parseTeamInfo(sections[2]);
 			enemyInfo = parseEnemyInfo(sections[3]);
-
 			warAttackInfo = consolidateInfo(teamInfo, enemyInfo);
 
 			fileDisplayArea.innerHTML = parseFile(sections[1]) + parseFile(sections[2]) + parseFile(sections[3]);
@@ -90,22 +88,15 @@ function parseWarInfo(input) {
 }
 
 function consolidateInfo(teamInfo, enemyInfo) {
-
 	for (var i = 0; i < teamInfo.length; i++) {
 		var enemyRank = teamInfo[i]['enemyRank'];
 
-		if (enemyRank){
-			var enemyWeight = enemyInfo[enemyRank-1]['warWeight'];
-			teamInfo[i]['enemyWeight'] = enemyWeight;
-		}
-
-			console.log(teamInfo[i]);
+		teamInfo[i]['enemyWeight'] = enemyRank ? enemyInfo[enemyRank-1]['warWeight'] : 0;
 	}
-
+	return teamInfo;
 }
 
 function parseTeamInfo(input) {
-
 	var rank, player, warWeight, enemyRank, stars, percentage, loot, notes;
 	var teamInfo = [];
 
